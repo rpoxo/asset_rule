@@ -29,7 +29,7 @@ DEBUGS_DEFAULT = [
 
 SQUAD_NAMES = {
     1 : ['CAS', 'TRANS'],
-    2 : ['TRANS']
+    2 : ['TRANS'],
     3 : ['TANK']
     }
 

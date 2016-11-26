@@ -34,7 +34,6 @@ def deinit():
 # ------------------------------------------------------------------------
 # onGameStatusChanged
 # ------------------------------------------------------------------------
-'''
 def onGameStatusChanged(status):
     global g_squad_monitor_enabled
 
@@ -99,6 +98,5 @@ def check7Squads(data = ''):
                 pass
 
         g_squadNames[team][_id] = name
-'''
 
     
