@@ -1,11 +1,11 @@
-#import bf2
-#import host
+import bf2
+import host
 
-#import game.realitycore as rcore
-#import game.realitytimer as rtimer
+import game.realitycore as rcore
+import game.realitytimer as rtimer
 
 import config as C
-#import advdebug as D
+import advdebug as D
 
 global g_squad_monitor_enabled
 global g_squad_timer_check
@@ -18,7 +18,7 @@ g_squad_check_interval = 5
 # Init
 # ------------------------------------------------------------------------
 def init():
-    #host.registerGameStatusHandler(onGameStatusChanged)
+    host.registerGameStatusHandler(onGameStatusChanged)
     pass
 
 # ------------------------------------------------------------------------
@@ -28,7 +28,7 @@ def deinit():
     global g_squad_monitor_enabled
     g_squad_monitor_enabled = False
     destroySquadCheckTimer()
-    #host.unregisterGameStatusHandler(onGameStatusChanged)
+    host.unregisterGameStatusHandler(onGameStatusChanged)
 
 
 # ------------------------------------------------------------------------
@@ -39,11 +39,11 @@ def onGameStatusChanged(status):
 
     if status == bf2.GameStatus.Playing:
         # registering chatMessage handler
-        #D.debugMessage('initializing asset rule')
-        #host.registerHandler('ChatMessage', onChatMessage, 1)
-        #host.registerHandler( 'EnterVehicle', onEnterVehicle )
-        #host.registerHandler( 'ExitVehicle', onExitVehicle )
-        #host.registerHandler( 'VehicleDestroyed', onVehicleDestroyed )
+        D.debugMessage('initializing asset rule')
+        host.registerHandler('ChatMessage', onChatMessage, 1)
+        host.registerHandler( 'EnterVehicle', onEnterVehicle )
+        host.registerHandler( 'ExitVehicle', onExitVehicle )
+        host.registerHandler( 'VehicleDestroyed', onVehicleDestroyed )
         
         #rcore.clearScreen( player )
         #rcore.blackScreen( player )
