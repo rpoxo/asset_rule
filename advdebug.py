@@ -21,7 +21,6 @@ global G_TIME_START  # global time, being set at start of round
 
 G_TIME_START = 0
 SOCK = None
-FILENAME_DEBUG = 'debug_objmodv2.log'
 
 
 # ------------------------------------------------------------------------
@@ -50,7 +49,6 @@ def init():
         debugEcho('Failed to create socket')
 
     setStartTime()
-    setLogFilename()
 
 # ------------------------------------------------------------------------
 # setStartTime
@@ -68,15 +66,6 @@ def setStartTime():
             str(G_TIME_START))
     except:
         debugEcho('setStartTime(): failed to reset start time')
-
-
-def setLogFilename():
-    global FILENAME_DEBUG
-
-    debugEcho('setting filename')
-    FILENAME_DEBUG = 'objmodv2_%s_%s_%s.log' % (
-        datetime.now().hour, datetime.now().minute, datetime.now().second)
-    debugEcho('filename set to %s' % (FILENAME_DEBUG))
 
 # ------------------------------------------------------------------------
 # sendMessageToAll
@@ -219,8 +208,7 @@ def debugFile(msg):
         # fileName = host.sgl_getModDirectory() + C.spawnerLogPath
         logFile = open(
             host.sgl_getModDirectory() +
-            '/python/game/asset_rule/' +
-            FILENAME_DEBUG,
+            C.LOGFILENAME,
             'a')
         logFile.write(str(msg) + '\n')
         logFile.close()

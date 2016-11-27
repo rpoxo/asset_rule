@@ -13,19 +13,20 @@ global g_squad_timer_check
 g_squad_monitor_enabled = False
 g_squad_timer_check = None
 g_squad_check_interval = 5
+g_limited_assets = {}
 
 # ------------------------------------------------------------------------
 # Init
 # ------------------------------------------------------------------------
 def init():
     host.registerGameStatusHandler(onGameStatusChanged)
-    pass
 
 # ------------------------------------------------------------------------
 # DeInit
 # ------------------------------------------------------------------------
 def deinit():
     global g_squad_monitor_enabled
+
     g_squad_monitor_enabled = False
     destroySquadCheckTimer()
     host.unregisterGameStatusHandler(onGameStatusChanged)
@@ -36,20 +37,23 @@ def deinit():
 # ------------------------------------------------------------------------
 def onGameStatusChanged(status):
     global g_squad_monitor_enabled
-
-    if status == bf2.GameStatus.Playing:
-        # registering chatMessage handler
-        D.debugMessage('initializing asset rule')
-        host.registerHandler('ChatMessage', onChatMessage, 1)
-        host.registerHandler( 'EnterVehicle', onEnterVehicle )
-        host.registerHandler( 'ExitVehicle', onExitVehicle )
-        host.registerHandler( 'VehicleDestroyed', onVehicleDestroyed )
-        
-        #rcore.clearScreen( player )
-        #rcore.blackScreen( player )
-        g_squad_monitor_enabled = True
-        setSquadCheckTimer()
-
+    
+    #if status == bf2.GameStatus.Playing:
+    # registering chatMessage handler
+    #host.registerHandler( 'ChatMessage', onChatMessage )
+    #host.registerHandler( 'EnterVehicle', onEnterVehicle )
+    #host.registerHandler( 'ExitVehicle', onExitVehicle )
+    #host.registerHandler( 'VehicleDestroyed', onVehicleDestroyed )
+    
+    #rcore.clearScreen( player )
+    #rcore.blackScreen( player )
+    updateLimitedAssets()
+    g_squad_monitor_enabled = True
+    setSquadCheckTimer()
+    #elif status == bf2.GameStatus.EndGame:
+    #    g_squad_monitor_enabled = False
+    #    destroySquadCheckTimer()
+    
 
 def destroySquadCheckTimer():
     global g_squad_timer_check
@@ -66,37 +70,104 @@ def setSquadCheckTimer():
     global g_squad_timer_check
     
     destroySquadCheckTimer( )
-
-    if not g_squad_monitor_enabled:
+    D.debugMessage('setting timer, monitorEnabled(%s)' % (g_squad_monitor_enabled))
+    
+    if g_squad_monitor_enabled:
+        D.debugMessage('setting timer, monitorEnabled(%s)' % (g_squad_monitor_enabled))
         g_squad_timer_check = rtimer.Timer( check7Squads, g_squad_check_interval, 1, '' )
         g_squad_timer_check.setRecurring( g_squad_check_interval )
+        D.debugMessage('timer set')
 
-def check7Squads(data = ''):
+def check7Squads( data ):
     if not g_squad_monitor_enabled:
         return
-
-    squads = host.rcon_invoke( "squadManager.listSquads " + str( team ) ).split( '\n' )
-    #D.debugMessage(squads)
-    for line in squads:
-        line = line.replace( '\n', '' )
-        line = line.replace( 'is public.', '' )
-        words = line.split( ' ' )
-
-        try:
-            _id = words.pop( 0 )
-            _id = int( _id.replace( 'id:', '' ) )
-            if _id == 0:
-                continue
-        except:
-            continue
-
-        name = None
-        if numPlayersOfSquad( team, _id ) > 0:
-            try:
-                name = ' '.join( words )
-            except:
-                pass
-
-        g_squadNames[team][_id] = name
-
     
+    squads_names = {}
+
+    for team_check in range(1,3):
+        D.debugMessage('checking squads in team %s' % (team_check))
+
+        squads = host.rcon_invoke( "squadManager.listSquads " + str( team_check ) ).split( '\n' )
+        #D.debugMessage(squads)
+        for line in squads:
+            line = line.replace( '\n', '' )
+            line = line.replace( 'is public.', '' )
+            words = line.split( ' ' )
+
+            try:
+                _id = words.pop( 0 )
+                _id = int( _id.replace( 'id:', '' ) )
+                if _id == 0:
+                    continue
+            except:
+                continue
+
+            #name = None
+            #name = ' '.join( words )
+            '''
+            if rcore.numPlayersOfSquad( g_team_check, _id ) > 0:
+                try:
+                    name = ' '.join( words )
+                except:
+                    pass
+            '''
+            #D.debugMessage(words)
+            name = words[0]
+            
+            
+            if team_check not in squads_names.keys():
+                squads_names[team_check] = {}
+
+            squads_names[team_check][_id] = name
+
+    #D.debugMessage(squads_names)
+
+    for player in rcore.getPlayers():
+        if player.isAIPlayer():
+            continue
+        checkPlayerInVehicleSquadName(player, squads_names)
+
+def updateLimitedAssets():
+    global g_limited_assets
+    
+    for vehicle_type in C.ASSETS.keys():
+        for asset in C.ASSETS[vehicle_type]:
+            if asset not in g_limited_assets.keys():
+                g_limited_assets[asset] = vehicle_type
+    
+
+def checkPlayerInVehicleSquadName(player, squads_names):
+    vehicleName = player.getVehicle().templateName
+    squadId = player.getSquadId( )
+    teamId = player.getTeam()
+
+    if squadId > 7 or squadId == 0:
+        return
+    else:
+        #D.debugMessage(squads_names)
+        try:
+            squadName = squads_names[teamId][squadId]
+        except:
+            D.debugMessage('failed to set squad name for team %s squad %s' % (teamId, squadId))
+
+    if vehicleName not in g_limited_assets.keys():
+        return
+    
+    vehicle_type = g_limited_assets[vehicleName]
+    if squadName.upper() not in C.SQUAD_NAMES[vehicle_type]:
+        D.debugMessage('blacking player %s riding %s in %s:%s' % (player.getName(), vehicleName, squadId, squadName))
+        rcore.blackScreen( player )
+    else:
+        D.debugMessage('clearing player %s in %s:%s' % (player.getName(), squadId, squadName))
+        rcore.clearScreen( player )
+        
+
+
+
+
+
+
+
+
+
+
