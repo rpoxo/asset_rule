@@ -78,7 +78,7 @@ def setSquadCheckTimer():
         g_squad_timer_check.setRecurring( g_squad_check_interval )
         D.debugMessage('timer set')
 
-def check7Squads( data ):
+def checkSquads( data ):
     if not g_squad_monitor_enabled:
         return
     
@@ -141,12 +141,12 @@ def checkPlayerInVehicleSquadName(player, squads_names):
     squadId = player.getSquadId( )
     teamId = player.getTeam()
 
-    if squadId > 7 or squadId == 0:
+    if squadId > 9 or squadId == 0:
         return
     else:
         #D.debugMessage(squads_names)
         try:
-            squadName = squads_names[teamId][squadId]
+            squadName = squads_names[teamId][squadId].upper()
         except:
             D.debugMessage('failed to set squad name for team %s squad %s' % (teamId, squadId))
 
@@ -154,9 +154,14 @@ def checkPlayerInVehicleSquadName(player, squads_names):
         return
     
     vehicle_type = g_limited_assets[vehicleName]
-    if squadName.upper() not in C.SQUAD_NAMES[vehicle_type]:
+    if squadName not in C.SQUAD_NAMES[vehicle_type] or :
         D.debugMessage('blacking player %s riding %s in %s:%s' % (player.getName(), vehicleName, squadId, squadName))
         rcore.blackScreen( player )
+        rcore.sendMessageToPlayer(player, 2021403, 0)
+    elif squadName in C.SQUAD_NAMES[vehicle_type] and vehicleName.split('_')[1] in ['apc', 'ifv']:
+        D.debugMessage('blacking player %s riding %s in %s:%s' % (player.getName(), vehicleName, squadId, squadName))
+        rcore.blackScreen( player )
+        rcore.sendMessageToPlayer(player, 2021403, 0)
     else:
         D.debugMessage('clearing player %s in %s:%s' % (player.getName(), squadId, squadName))
         rcore.clearScreen( player )
