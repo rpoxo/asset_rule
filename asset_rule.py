@@ -154,7 +154,7 @@ def checkPlayerInVehicleSquadName(player, squads_names):
         return
     
     vehicle_type = g_limited_assets[vehicleName]
-    if squadName not in C.SQUAD_NAMES[vehicle_type] or :
+    if squadName not in C.SQUAD_NAMES[vehicle_type]:
         D.debugMessage('blacking player %s riding %s in %s:%s' % (player.getName(), vehicleName, squadId, squadName))
         rcore.blackScreen( player )
         rcore.sendMessageToPlayer(player, 2021403, 0)
