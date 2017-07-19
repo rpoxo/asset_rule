@@ -26,6 +26,11 @@ DEBUGS_DEFAULT = [
     #'ingame' # printing debug ingame
 ]
 
+LIMITED_SQUADS = [
+    'CAS',
+    'TANK',
+    'TRANS',
+    ]
 
 SQUAD_NAMES = {
     'jet' : ['CAS'],

@@ -158,7 +158,7 @@ def checkPlayerInVehicleSquadName(player, squads_names):
         D.debugMessage('blacking player %s riding %s in %s:%s' % (player.getName(), vehicleName, squadId, squadName))
         rcore.blackScreen( player )
         rcore.sendMessageToPlayer(player, 2021403, 0)
-    elif squadName in C.SQUAD_NAMES[vehicle_type] and vehicleName.split('_')[1] in ['apc', 'ifv']:
+    elif squadName in C.LIMITED_SQUADS and vehicleName.split('_')[1] in ['apc', 'ifv']:
         D.debugMessage('blacking player %s riding %s in %s:%s' % (player.getName(), vehicleName, squadId, squadName))
         rcore.blackScreen( player )
         rcore.sendMessageToPlayer(player, 2021403, 0)
