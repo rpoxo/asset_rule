@@ -41,13 +41,11 @@ SOCK = None
 def init():
     global SOCK
 
-    if 'udp' in C.DEBUGS_DEFAULT:
-        # create dgram udp socket
-        try:
-            SOCK = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            debugEcho('Created socket')
-        except socket.error:
-            debugEcho('Failed to create socket')
+    try:
+        SOCK = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        debugEcho('Created socket')
+    except socket.error:
+        debugEcho('Failed to create socket')
 
     setStartTime()
 
@@ -194,8 +192,7 @@ def debugUDP(msg, type=1):
             'msg': msg
         }
         message = cPickle.dumps(data)
-        if 'udp' in C.DEBUGS_DEFAULT:
-            SOCK.sendto(message, (C.CLIENTHOST, C.CLIENTPORT))
+        SOCK.sendto(message, (C.CLIENTHOST, C.CLIENTPORT))
     except:
         debugEcho('debugUDP(): failed to send debug message')
 
